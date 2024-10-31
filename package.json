@@ -1,0 +1,22 @@
+{
+  "name": "tongifts-server",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "serve": "tsx ./index.ts"
+  },
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.8.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@denull/tg-bot-api": "^2.2.0",
+    "dotenv": "^16.4.5",
+    "mongodb": "^6.10.0",
+    "tg-format": "^1.1.2"
+  }
+}
