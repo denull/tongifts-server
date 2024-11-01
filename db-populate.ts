@@ -53,14 +53,17 @@ mongo.connect().then(async client => {
     gift['_id'] = result.insertedId;
   }
   await gifts.createIndex({ order: 1 });
+
+  const rand = (await (await fetch(`https://randomuser.me/api/?inc=name,picture&results=${userCount}&noinfo`)).json()).results;
   const users = db.collection('users');
   await users.deleteMany();
   const userList: any[] = [];
   for (let i = 0; i < userCount; i++) {
     const user = {
       _id: (i == userCount - 1 ? ownerId : Math.round(Math.random() * 1e12)) as any,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
+      firstName: rand[i].name.first,
+      lastName: Math.random() > 0.3 ? rand[i].name.last : null,
+      photo: Math.random() > 0.1 ? Buffer.from(await (await fetch(rand[i].picture.large)).arrayBuffer()) : null,
       premium: Math.random() > 0.5,
       theme: Math.random() > 0.5 ? 'day' : 'night',
       locale: Math.random() > 0.5 ? 'ru' : 'en',
@@ -95,19 +98,20 @@ mongo.connect().then(async client => {
       receiver.gifts++;
     }
     actionList.push(action);
-    if (action.type == 'buy') {
-      await gifts.updateOne({ _id: gift['_id'] }, {
-        $set: { sold: gift.sold },
-      });
-    } else
-    if (action.type == 'send') {
-      await users.updateOne({ _id: receiver['_id'] }, {
-        $set: { gifts: receiver.gifts },
-      });
-    }
   }
+  for (const gift of giftList) {
+    await gifts.updateOne({ _id: gift['_id'] }, {
+      $set: { sold: gift.sold },
+    });
+  }
+  for (const user of userList) {
+    await users.updateOne({ _id: user['_id'] }, {
+      $set: { gifts: user.gifts },
+    });
+  }
+  actionList.sort((a0, a1) => a0.date.getTime() - a1.date.getTime());
   await actions.insertMany(actionList);
-  await actions.createIndex({ userId: 1, receiverId: 1, giftId: 1 });
+  await actions.createIndex({ type: 1, userId: 1, receiverId: 1, giftId: 1 });
   console.log('Done');
   await mongo.close();
   process.exit();
