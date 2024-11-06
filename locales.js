@@ -36,6 +36,7 @@ const locales = {
 
     btnClose: 'Close',
     btnBuyGift: 'Buy a Gift',
+    btnSoldOut: 'Sold Out',
     btnPay: 'Pay',
     btnSendGift: 'Send Gift',
     btnSendToContact: 'Send Gift to Contact',
@@ -48,6 +49,7 @@ const locales = {
 
     sendGiftOf: gift => `Send a gift of ${gift}`,
     gift: 'Gift',
+    sender: 'From',
     date: 'Date',
     price: 'Price',
     availability: 'Availability',
@@ -66,13 +68,13 @@ const locales = {
     recentActions: 'Recent Actions',
     invoiceText: gift => `Purchasing a ${gift} gift`,
 
-    actionBought: 'Bought',
-    actionSent: 'Sent',
-    actionReceived: 'Received',
+    action_buy: 'Bought',
+    action_send: 'Sent',
+    action_receive: 'Received',
 
     profileEmpty: 'You can buy a gift to receive a gift in return.',
     storeTitle: 'Buy and Send Gifts',
-    storeSubtitle: 'Unique gifts for everyone by Crypto Pay.',
+    storeSubtitle: 'Unique gifts for everyone by Crypto Pay.',
     giftsTitle: 'Send Gifts in Telegram',
     giftsSubtitle: 'Send gifts to users that can be stored in their app profile.',
     giftsEmpty: 'You don\'t have any gifts yet.',
@@ -95,6 +97,7 @@ const locales = {
 
     btnClose: 'Закрыть',
     btnBuyGift: 'Купить подарок',
+    btnSoldOut: 'Распродано',
     btnPay: 'Оплатить',
     btnSendGift: 'Отправить подарок',
     btnSendToContact: 'Отправить подарок контакту',
@@ -107,6 +110,7 @@ const locales = {
 
     sendGiftOf: gift => `Отправить подарок «${gift}»`,
     gift: 'Подарок',
+    sender: 'Отправитель',
     date: 'Дата',
     price: 'Цена',
     availability: 'Количество',
@@ -125,15 +129,15 @@ const locales = {
     recentActions: 'Недавние действия',
     invoiceText: gift => `Приобретение подарка «${gift}»`,
 
-    actionBought: 'Куплен',
-    actionSent: 'Отправлен',
-    actionReceived: 'Получен',
+    action_buy: 'Куплен',
+    action_send: 'Отправлен',
+    action_receive: 'Получен',
 
     profileEmpty: 'Вы можете купить подарок чтобы получить подарок в ответ.',
     storeTitle: 'Покупайте и отправляйте подарки',
-    storeSubtitle: 'Уникальный подарки для всех от Crypto Pay.',
+    storeSubtitle: 'Уникальные подарки для всех от Crypto Pay.',
     giftsTitle: 'Отправляйте подарки в Telegram',
-    giftsSubtitle: 'Отправляйте подарки, которые будут отоборажаться в профилях получателей в приложении.',
+    giftsSubtitle: 'Отправляйте подарки, которые будут отображаться в профилях получателей в приложении.',
     giftsEmpty: 'Вы ещё не купили ни одного подарка.',
     actionsTitle: 'Недавние действия',
     actionsSubtitle: 'Вот список ваших последних действий.',

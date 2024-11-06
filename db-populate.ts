@@ -2,6 +2,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { MongoClient, ObjectId } from 'mongodb';
 import { faker } from '@faker-js/faker';
+import { readFileSync } from 'fs';
 
 const ownerId = 888352;
 const userCount = 120;
@@ -9,6 +10,7 @@ const actionCount = 20000;
 const giftList = [{
   order: 1,
   image: 'delicious-cake',
+  color: 'FE9F41',
   name: { en: 'Delicious Cake', ru: 'Вкусный торт' },
   price: 10,
   asset: 'USDT',
@@ -17,6 +19,7 @@ const giftList = [{
 }, {
   order: 2,
   image: 'green-star',
+  color: '46D100',
   name: { en: 'Green Star', ru: 'Зелёная звезда' },
   price: 5,
   asset: 'TON',
@@ -25,6 +28,7 @@ const giftList = [{
 }, {
   order: 3,
   image: 'blue-star',
+  color: '007AFF',
   name: { en: 'Blue Star', ru: 'Синяя звезда' },
   price: 0.01,
   asset: 'ETH',
@@ -33,6 +37,7 @@ const giftList = [{
 }, {
   order: 4,
   image: 'red-star',
+  color: 'FF4747',
   name: { en: 'Red Star', ru: 'Красная звезда' },
   price: 0.01,
   asset: 'ETH',
@@ -49,6 +54,7 @@ mongo.connect().then(async client => {
   const gifts = db.collection('gifts');
   await gifts.deleteMany();
   for (const gift of giftList) {
+    gift['anim'] = readFileSync(`anim/gift-${gift.image}.json`, 'utf-8');
     const result = await gifts.insertOne(gift);
     gift['_id'] = result.insertedId;
   }
@@ -95,6 +101,13 @@ mongo.connect().then(async client => {
     } else
     if (action.type == 'send') {
       action['receiverId'] = receiver['_id'];
+      actionList.push({ // Also add a receive event
+        date: action.date,
+        type: 'receive',
+        userId: action['receiverId'],
+        giftId: action.giftId,
+        senderId: action.userId,
+      });
       receiver.gifts++;
     }
     actionList.push(action);
