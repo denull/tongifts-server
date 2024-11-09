@@ -274,6 +274,8 @@ app.post('/api/settings', async (req, res) => { // Update settings
   res.json({ ok: true });
 });
 app.post('/api/init', async (req, res) => {
+  await upsertUser(bot, req.init.user);
+  
   const myId = req.init.user?.id;
   let giftReceived;
   if (req.init.start_param) {
@@ -294,7 +296,6 @@ app.post('/api/init', async (req, res) => {
     }
   }
 
-  await upsertUser(bot, req.init.user);
   const [me, gifts, inventory, leaderboard, received] = await Promise.all([
     findUser(myId),
     findAllGifts(),

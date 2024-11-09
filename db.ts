@@ -88,16 +88,17 @@ export async function insertInvoice(userId, invoiceId, giftId, price, asset) {
   });
 }
 export async function updateInvoicePaid(invoiceId) {
+  const code = nanoid(16);
   const action = await actions.findOneAndUpdate({ invoiceId }, { $set: {
     type: 'buy',
-    code: nanoid(16),
+    code,
   } }, { returnDocument: 'after' });
   console.log('after update: ', action);
   if (!action) {
     return null;
   }
   await gifts.updateOne({ _id: action.giftId }, { $inc: { sold: 1 }});
-  return (await findActions({ _id: action._id }))[0];
+  return findReadyToSendGift(code);
 }
 export async function updateGiftSent(id: string, inlineId: string) {
   return await actions.findOneAndUpdate({ _id: ObjectId.createFromHexString(id), type: 'buy', sendId: null, receiveId: null, inlineId: null }, { $set: {
