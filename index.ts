@@ -121,11 +121,11 @@ app.post('/webhook', async (req, res) => {
         type: 'article',
         id: gift._id.toHexString(),
         title: loc(user.locale, 'btnSendGift'),
-        description: loc(user.locale, 'sendGiftOf')(allGifts[gift.giftId].name[user.locale]),
+        description: loc(user.locale, 'sendGiftOf')(allGifts[gift.giftId.toString()].name[user.locale]),
         //thumbnail_url: `${process.env.SERVER_URL}/assets/logo-300x300.png`,
         //thumbnail_width: 300,
         //thumbnail_height: 300,
-        thumbnail_url: `${process.env.SERVER_URL}/assets/gift/${allGifts[gift.giftId].image}.png`,
+        thumbnail_url: `${process.env.SERVER_URL}/assets/gift/${allGifts[gift.giftId.toString()].image}.png`,
         thumbnail_width: 512,
         thumbnail_height: 512,
         input_message_content: {
@@ -282,7 +282,7 @@ app.post('/api/init', async (req, res) => {
   if (req.init.start_param) {
     giftReceived = await updateGiftReceived(req.init.start_param, myId);
     if (giftReceived?.buy) {
-      const sender = await findUser(giftReceived.buy.userId);
+      const sender = (await findUser(giftReceived.buy.userId))!;
       bot.editMessageText({
         inline_message_id: giftReceived.buy.inlineId,
         ...loc(sender.locale, 'giftMessageReceived'),

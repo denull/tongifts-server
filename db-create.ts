@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { MongoClient, ObjectId } from 'mongodb';
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
-const mongo = new MongoClient(`mongodb://${process.env.MONGO_HOST}/`);
+const mongo: MongoClient = new MongoClient(`mongodb://${process.env.MONGO_HOST}/`);
 mongo.connect().then(async client => {
   const db = client.db(process.env.MONGO_DB);
   const gifts = db.collection('gifts');

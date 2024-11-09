@@ -1,8 +1,48 @@
 
-import { MongoClient, ObjectId } from 'mongodb';
+import { Db, Collection, MongoClient, ObjectId, Binary } from 'mongodb';
 import { nanoid } from 'nanoid';
 
-const pageSize = 24;
+type User = {
+  _id: number,
+  firstName: string,
+  lastName: string,
+  username: string,
+  photo: Binary,
+  photoId: string,
+  photoTs: number,
+  premium: boolean,
+  locale: string,
+  theme: string,
+  gifts: number,
+}
+type Gift = {
+  _id: ObjectId,
+  order: number,
+  image: string,
+  color: string,
+  name: Object,
+  price: number,
+  asset: string,
+  total: number,
+  sold: number,
+  anim: string,
+}
+type Action = {
+  _id: ObjectId,
+  code: string,
+  date: Date,
+  type: 'invoice' | 'buy' | 'send' | 'receive',
+  giftId: ObjectId,
+  userId: number,
+  invoiceId: number,
+  senderId: number,
+  receiverId: number,
+  inlineId: string,
+  price: number,
+  asset: string,
+}
+
+const pageSize: number = 24;
 const userProjection = {
   firstName: 1,
   lastName: 1,
@@ -27,10 +67,10 @@ const actionProjection = {
   price: 1,
   asset: 1,
 }
-let db, client, gifts, users, actions;
+let db: Db, client: MongoClient, gifts: Collection, users: Collection, actions: Collection;
 
 export async function initDb() {
-  const mongo = new MongoClient(`mongodb://${process.env.MONGO_HOST}/`);
+  const mongo: MongoClient = new MongoClient(`mongodb://${process.env.MONGO_HOST}/`);
   client = await mongo.connect();
   db = client.db(process.env.MONGO_DB);
   gifts = db.collection('gifts');
@@ -39,7 +79,7 @@ export async function initDb() {
 }
 
 export async function upsertUser(bot, user) {
-  const result: any = await users.findOneAndUpdate(
+  const result: User = (await users.findOneAndUpdate(
     { _id: user.id },
     {
       $set: {
@@ -55,7 +95,7 @@ export async function upsertUser(bot, user) {
       },
     },
     { upsert: true, returnDocument: 'after' }
-  );
+  )) as any;
 
   if (!result.photoTs || Date.now() - result.photoTs > 30 * 60 * 1000) {
     // Time to refresh userpic (note: this is a longer operation, it won't affect current result)
@@ -88,7 +128,7 @@ export async function insertInvoice(userId, invoiceId, giftId, price, asset) {
   });
 }
 export async function updateInvoicePaid(invoiceId) {
-  const code = nanoid(16);
+  const code: string = nanoid(16);
   const action = await actions.findOneAndUpdate({ invoiceId }, { $set: {
     type: 'buy',
     code,
@@ -106,7 +146,7 @@ export async function updateGiftSent(id: string, inlineId: string) {
   } }, { returnDocument: 'after' });
 }
 export async function updateGiftReceived(code: string, userId: number) {
-  const date = new Date();
+  const date: Date = new Date();
   // First, pre-check
   const before = await actions.findOne({ code, type: 'buy' }, { projection: actionProjection });
   if (!before) {
@@ -151,13 +191,13 @@ export async function updateGiftReceived(code: string, userId: number) {
     receiveId,
   } }, { returnDocument: 'after' });
   // Increment gift counter
-  await users.updateOne({ _id: userId }, { $inc: { gifts: 1 }});
+  await users.updateOne({ _id: userId as any }, { $inc: { gifts: 1 }});
   // And return the receive action
   const receive = (await findActions({ _id: receiveId }))[0];
   return { buy, receive };
 }
-export async function findAllGifts() {
-  return (await gifts.find().sort('order', 'asc')).toArray();
+export async function findAllGifts(): Promise<Gift[]> {
+  return (await gifts.find().sort('order', 'asc')).toArray() as Promise<any[]>;
 }
 export function findStoreGift(giftId: string) {
   return gifts.findOne({ _id: ObjectId.createFromHexString(giftId) });
@@ -170,36 +210,36 @@ export function findUser(id: number) {
   } });
 }
 export function updateUser(id: number, update: Object) {
-  return users.updateOne({ _id: id }, { $set: update });
+  return users.updateOne({ _id: id as any }, { $set: update });
 }
-export async function findUserPhoto(id: number) {
+export async function findUserPhoto(id: number): Promise<Binary> {
   return (await users.findOne({ _id: id as any }, { projection: ['photo'] }))?.photo;
 }
-export async function findTopUsers() {
-  return (await users.find({}, { projection: userProjection }).sort('gifts', 'desc').limit(100)).toArray();
+export async function findTopUsers(): Promise<User[]> {
+  return (await users.find({}, { projection: userProjection }).sort('gifts', 'desc').limit(100)).toArray() as Promise<any[]>;
 }
-export async function findUsers(ids: number[]) {
-  return (await users.find({ _id: { $in: ids as any }}, { projection: userProjection }).sort('gifts', 'desc').limit(100)).toArray();
+export async function findUsers(ids: number[]): Promise<User[]> {
+  return (await users.find({ _id: { $in: ids as any }}, { projection: userProjection }).sort('gifts', 'desc').limit(100)).toArray() as Promise<any[]>;
 }
-export async function findUsersByName(name: string, offs: number = 0) {
+export async function findUsersByName(name: string, offs: number = 0): Promise<User[]> {
   return (await users.find({
     $or: [
       { firstName: { $regex: name, $options: '$i' } },
       { lastName: { $regex: name, $options: '$i' } },
       { username: { $regex: name, $options: '$i' } },
     ]
-  }, { projection: userProjection }).sort('gifts', 'desc').skip(offs).limit(100)).toArray();
+  }, { projection: userProjection }).sort('gifts', 'desc').skip(offs).limit(100)).toArray() as Promise<any[]>;
 }
-export function findPosition(user) {
+export function findPosition(user): Promise<number> {
   return users.countDocuments({ gifts: { $gt: user.gifts || 0 } });
 }
-export async function findReadyToSendGift(code: string) {
-  return actions.findOne({ code, type: 'buy', sendId: null, receiveId: null, inlineId: null }, { projection: { ...actionProjection, code: 1 } });
+export async function findReadyToSendGift(code: string): Promise<Action> {
+  return actions.findOne({ code, type: 'buy', sendId: null, receiveId: null, inlineId: null }, { projection: { ...actionProjection, code: 1 } }) as any;
 }
-export async function findInventory(userId: number, offs: number = 0) {
-  return (await actions.find({ userId, type: 'buy', sendId: null, receiveId: null, inlineId: null }, { projection: { ...actionProjection, code: 1 } }).sort('_id', 'desc').skip(offs).limit(pageSize)).toArray();
+export async function findInventory(userId: number, offs: number = 0): Promise<Action[]> {
+  return (await actions.find({ userId, type: 'buy', sendId: null, receiveId: null, inlineId: null }, { projection: { ...actionProjection, code: 1 } }).sort('_id', 'desc').skip(offs).limit(pageSize)).toArray() as Promise<any[]>;
 }
-async function findActions(query, offs: number = 0) {
+async function findActions(query, offs: number = 0): Promise<Action[]> {
   const list: any[] = await (await actions.find(query, { projection: actionProjection }).sort('_id', 'desc').skip(offs).limit(pageSize)).toArray();
   if (list.length) {
     const users = await findUsers([...new Set(
@@ -216,12 +256,12 @@ async function findActions(query, offs: number = 0) {
   }
   return list;
 }
-export function findReceivedGifts(id: number, offs: number = 0) {
+export function findReceivedGifts(id: number, offs: number = 0): Promise<Action[]> {
   return findActions({ userId: id, type: 'receive' }, offs);
 }
-export function findRecentActions(id: number, offs: number = 0) {
+export function findRecentActions(id: number, offs: number = 0): Promise<Action[]> {
   return findActions({ userId: id, type: { $in: ['buy', 'send', 'receive'] } }, offs);
 }
-export function findGiftActions(gift: string, offs: number = 0) {
+export function findGiftActions(gift: string, offs: number = 0): Promise<Action[]> {
   return findActions({ giftId: ObjectId.createFromHexString(gift), type: { $in: ['buy', 'send'] } }, offs);
 }
