@@ -18,7 +18,7 @@ import { initDb, upsertUser, updateInvoicePaid,
   findUsersByName
 } from './db';
 
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+dotenv.config({ path: path.join(__dirname, '.env') });
 const bot: any = new TelegramBotAPI(process.env.TELEGRAM_TOKEN);
 const invoiceSockets = {};
 
@@ -116,6 +116,7 @@ app.post('/webhook', async (req, res) => {
     bot.answerInlineQuery({
       inline_query_id: inlineQuery.id,
       is_personal: true,
+      cache_time: 0,
       results: gifts.map(gift => ({
         type: 'article',
         id: gift._id.toHexString(),
@@ -275,7 +276,7 @@ app.post('/api/settings', async (req, res) => { // Update settings
 });
 app.post('/api/init', async (req, res) => {
   await upsertUser(bot, req.init.user);
-  
+
   const myId = req.init.user?.id;
   let giftReceived;
   if (req.init.start_param) {
