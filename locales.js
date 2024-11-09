@@ -27,7 +27,7 @@ function fmtNum(num) {
   return Math.floor(num / 1e6) + 'M';
 }
 
-const locales = {
+export const locales = {
   en: {
     store: 'Store',
     gifts: 'Gifts',
@@ -65,6 +65,7 @@ const locales = {
     receivedMessage: ({ name, gift }) => fmt`👌 ${[name, 'bold']} received your gift of ${[gift, 'bold']}.`,
     purchasedMessage: gift => fmt`✅ You have purchased the gift of ${[gift, 'bold']}.`,
     giftMessage: fmt`🎁 I have a ${['gift', 'bold']} for you! Tap the button below to open it.`,
+    giftMessageReceived: fmt`🎁 Gift received`,
     recentActions: 'Recent Actions',
     invoiceText: gift => `Purchasing a ${gift} gift`,
 
@@ -126,6 +127,7 @@ const locales = {
     receivedMessage: ({ name, gift }) => fmt`👌 ${[name, 'bold']} получил(а) ваш подарок «${[gift, 'bold']}».`,
     purchasedMessage: gift => fmt`✅ Вы купили подарок «${[gift, 'bold']}».`,
     giftMessage: fmt`🎁 У меня для тебя есть ${['подарок', 'bold']}! Нажми кнопку ниже, чтобы открыть его.`,
+    giftMessageReceived: fmt`🎁 Подарок получен`,
     recentActions: 'Недавние действия',
     invoiceText: gift => `Приобретение подарка «${gift}»`,
 
@@ -148,7 +150,7 @@ const locales = {
     giftBoughtTitle: 'Вы купили подарок',
     giftBoughtSubtitle: 'Теперь отправьте его своему другу.',
     purchasedTitle: 'Подарок куплен',
-    purchasedSubtitle: ({ gift, price, asset }) => `Подарок «${gift}» был куплен за ${price} ${asset}.`,
+    purchasedSubtitle: ({ gift, price, asset }) => `Вы купили «${gift}» за ${price} ${asset}.`,
   }
 }
 

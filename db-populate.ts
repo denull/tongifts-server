@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { MongoClient, ObjectId } from 'mongodb';
 import { faker } from '@faker-js/faker';
 import { readFileSync } from 'fs';
+import { nanoid } from 'nanoid';
 
 const ownerId = 888352;
 const userCount = 120;
@@ -92,6 +93,7 @@ mongo.connect().then(async client => {
       giftId: gift['_id'],
     }
     if (action.type == 'buy') {
+      action['code'] = nanoid(16);
       action['price'] = gift.price;
       action['asset'] = gift.asset;
       if (gift.sold >= gift.total) {
@@ -124,7 +126,7 @@ mongo.connect().then(async client => {
   }
   actionList.sort((a0, a1) => a0.date.getTime() - a1.date.getTime());
   await actions.insertMany(actionList);
-  await actions.createIndex({ type: 1, userId: 1, receiverId: 1, giftId: 1 });
+  await actions.createIndex({ type: 1, code: 1, invoiceId: 1, userId: 1, senderId: 1, receiverId: 1, giftId: 1 });
   console.log('Done');
   await mongo.close();
   process.exit();

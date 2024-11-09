@@ -11,7 +11,7 @@ mongo.connect().then(async client => {
   const actions = db.collection('actions');
   await gifts.createIndex({ order: 1 });
   await users.createIndex({ gifts: -1 });
-  await actions.createIndex({ type: 1, userId: 1, receiverId: 1, giftId: 1 });
+  await actions.createIndex({ type: 1, code: 1, invoiceId: 1, userId: 1, senderId: 1, receiverId: 1, giftId: 1 });
   console.log('Done');
   await mongo.close();
   process.exit();
