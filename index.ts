@@ -240,7 +240,7 @@ app.post('/api/users/:id/gifts', async (req, res) => { // List of gifts received
     res.status(400).end();
     return;
   }
-  res.json(await findReceivedGifts(parseInt(req.params.id, isNaN(parseInt(req.query.offs)) ? 0 : parseInt(req.query.offs))));
+  res.json(await findReceivedGifts(parseInt(req.params.id), isNaN(parseInt(req.query.offs)) ? 0 : parseInt(req.query.offs)));
 });
 app.post('/api/inventory', async (req, res) => { // List of gifts we bought (but not sent yet)
   res.json(await findInventory(req.init.user.id, isNaN(parseInt(req.query.offs)) ? 0 : parseInt(req.query.offs)));
@@ -323,7 +323,7 @@ app.get('/user/:id/photo.jpg', async (req, res) => {
   res.send(photo.buffer);
 });
 
-const wss = new WebSocketServer({ port: process.env.WEBSOCKET_PORT });
+const wss = new WebSocketServer({ port: process.env.WEBSOCKET_PORT as any });
 wss.on('connection', (ws) => {
   let invoiceId;
   ws.on('error', console.error);

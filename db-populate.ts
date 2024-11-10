@@ -48,7 +48,7 @@ const giftList = [{
 
 // DANGER: this script will fully replace the current DB if it exists!
 
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+dotenv.config({ path: path.join(__dirname, '.env') });
 const mongo: MongoClient = new MongoClient(`mongodb://${process.env.MONGO_HOST}/`);
 mongo.connect().then(async client => {
   const db = client.db(process.env.MONGO_DB);
