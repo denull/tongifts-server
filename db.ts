@@ -133,7 +133,6 @@ export async function updateInvoicePaid(invoiceId) {
     type: 'buy',
     code,
   } }, { returnDocument: 'after' });
-  console.log('after update: ', action);
   if (!action) {
     return null;
   }

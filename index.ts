@@ -81,7 +81,6 @@ app.post('/webhook', async (req, res) => {
   if (req.body.message) {
     const message = req.body.message;
     const user = await upsertUser(bot, message.from);
-    //console.log(user);
     if (message.text == '/start') {
       bot.sendPhoto({
         chat_id: message.chat.id,
@@ -112,7 +111,6 @@ app.post('/webhook', async (req, res) => {
     const gifts = inlineQuery.query ? [await findReadyToSendGift(
       inlineQuery.query,
     )].filter(gift => !!gift) : await findInventory(inlineQuery.from.id);
-    //console.log(allGifts);
     bot.answerInlineQuery({
       inline_query_id: inlineQuery.id,
       is_personal: true,
@@ -146,15 +144,12 @@ app.post('/webhook', async (req, res) => {
   }
 });
 app.post('/cryptopay', async (req, res) => {
-  console.log('recv cryptopay webhook', req.body, req.headers);
   if (!checkCryptoPaySignature(process.env.CRYPTOPAY_TOKEN, req)) {
     res.status(401).end();
     return;
   }
-  //console.log(req.body);
   if (req.body.update_type == 'invoice_paid') {
     const invoice = req.body.payload;
-    console.log('updating action');
     const action = await updateInvoicePaid(invoice.invoice_id);
     if (invoiceSockets[invoice.invoice_id]) { // Notify client and close connection
       invoiceSockets[invoice.invoice_id].send(JSON.stringify({ status: 'paid', action }));
